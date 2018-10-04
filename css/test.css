@@ -14,8 +14,15 @@ html, body {
     #windy .box,
     #windy #embed-zoom {
         display: none !important; }
+    #windy #progress-bar {
+        background-color: transparent !important; }
     #windy #logo-wrapper {
         top: initial;
         bottom: 40px; }
     #windy #logo-wrapper #logo {
         left: 50px; }
+    #windy .plugin-mobile-rhpane .closing-x {
+        font-size: 24px !important;
+        background-color: transparent !important; }
+
+.bold {font-weight: bold}
