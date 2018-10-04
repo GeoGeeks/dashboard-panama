@@ -30,7 +30,7 @@ windyInit( options, windyAPI => {
 
     var prueba;
 
-    DataFrame.fromCSV('http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv')
+    DataFrame.fromCSV('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv')
         .then(df => {
             console.log(df);
             var df_pa;
