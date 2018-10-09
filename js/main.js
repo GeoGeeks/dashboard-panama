@@ -1,53 +1,138 @@
-require([
-    "esri/core/urlUtils",
-
-    "esri/Map",
-    "esri/views/MapView",
-
-    "esri/widgets/Expand",
-    "esri/widgets/BasemapGallery",
-
-    "dojo/domReady!"
-], function(
-    urlUtils,
-    Map, MapView,
-    Expand, BasemapGallery
-) {
-
-    // Authenticate application
-    urlUtils.addProxyRule({
-        urlPrefix: "route.arcgis.com", // specify resource location
-        proxyUrl: "/sproxy/" // specify location of proxy file
-    });
-
-    // Create map
-    var map = new Map({
-        basemap: "topo"
-    });
-
-    // Create view
-    var view = new MapView({
-        container: "mapDiv",
-        map: map,
-        zoom: 8,
-        center: [-79.409, 8.918],
-        constraints: {
-            rotationEnabled: false
+new Chart(document.getElementById("bar-chart"), {
+    type: 'bar',
+    data: {
+        labels: ["Terremotos", "Incendios", "Huracanes", "Volcanes activos"],
+        datasets: [
+            {
+                label: "Population (millions)",
+                backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+                data: [4, 24, 3, 2]
+            }
+        ]
+    },
+    options: {
+        legend: { display: false },
+        title: {
+            display: true,
+            text: 'Eventos naturales'
         }
-    });
+    }
+});
 
 
-    // Create Basemap Gallery Widget
-    var basemapGallery = new BasemapGallery({
-        view: view,
-        container: document.createElement("div")
-    });
 
-    // Create Expand widget with the previuos widget and add it to the UI
-    var bgExpand = new Expand({
-        view: view,
-        content: basemapGallery
-    });
-    view.ui.add(bgExpand, "top-right");
+
+moment.locale('es');
+
+$(document).ready(function() {
+    var interval = setInterval(function() {
+        var momentNow = moment();
+        $('#time').html(momentNow.format('HH:mm'));
+        $('#date').html(momentNow.format('LLLL').slice(0, -14))
+    }, 100);
+});
+
+
+// define options
+const options = {
+
+    // Required: API key
+    key: 'Hda2XFeROn7NWhHDEDWyoJqAdlTeiGO4',
+
+    // Optional: Initial state of the map
+    lat: 8.918,
+    lon: -79.409,
+    zoom: 6,
+};
+
+// Initialize Windy API
+windyInit( options, windyAPI => {
+    // windyAPI is ready, and contain 'map', 'store',
+    // 'picker' and other usefull stuff
+
+    const  { map }  = windyAPI;
+    // .map is instance of Leaflet map
+
+    var DataFrame = dfjs.DataFrame;
+
+    // bbox
+    var left = -82.9657830472 - 2,
+        bottom = 7.2205414901 - 2,
+        right = -77.2425664944 + 2,
+        top = 9.61161001224 + 2;
+
+    var prueba;
+
+
+    // function renderEarthquakes () {
+    //     DataFrame.fromCSV('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv')
+    //         .then(df => {
+    //             console.log(df);
+    //             var df_pa;
+    //
+    //             df_pa = df.filter(row => row.get('longitude') >= left && row.get('longitude') <= right);
+    //             df_pa = df_pa.filter(row => row.get('latitude') >= bottom && row.get('latitude') <= top);
+    //
+    //             var eqArray = [];
+    //
+    //             df_pa.map(row => {
+    //
+    //                 // template pop up
+    //                 var popUpTemplate = `
+    //                 <div class="earthquake-popup">
+    //                     <span class="bold">Magnitud</span>:   ${row.get('mag')}   <br>
+    //                     <span class="bold">Fecha</span>:      ${row.get('time')}  <br>
+    //                     <span class="bold">Lugar</span>:      ${row.get('place')} <br>
+    //                 </div>
+    //             `;
+    //
+    //                 // obtener coordenadas (longitud y latitud)
+    //                 const x = row.get('longitude');
+    //                 const y = row.get('latitude');
+    //
+    //                 marker = L.marker([y, x])
+    //                     .bindPopup(popUpTemplate);
+    //
+    //                 eqArray.push(marker);
+    //             });
+    //
+    //
+    //             var earthquakes = L.layerGroup(eqArray);
+    //
+    //         });
+    // }
+
+    DataFrame.fromCSV('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv')
+        .then(df => {
+            console.log(df);
+            var df_pa;
+
+
+
+            df_pa = df.filter(row => row.get('longitude') >= left && row.get('longitude') <= right);
+            df_pa = df_pa.filter(row => row.get('latitude') >= bottom && row.get('latitude') <= top);
+
+            df_pa.map(row => {
+
+                // obtener coordenadas (longitud y latitud)
+                const x = row.get('longitude');
+                const y = row.get('latitude');
+
+                marker = L.marker([y, x])
+                    .addTo(map);
+
+                var popUpTemplate = `
+                    <div class="earthquake-popup">
+                        <span class="bold">Magnitud</span>:   ${row.get('mag')}   <br>
+                        <span class="bold">Fecha</span>:      ${row.get('time')}  <br>
+                        <span class="bold">Lugar</span>:      ${row.get('place')} <br>
+                    </div>
+                `;
+
+                marker.bindPopup(popUpTemplate);
+                prueba = df;
+            });
+        });
 
 });
+

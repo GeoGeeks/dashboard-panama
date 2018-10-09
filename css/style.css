@@ -1,6 +1,40 @@
-html, body, #mapDiv {
-    padding: 0;
-    margin: 0;
+html, body {
     height: 100%;
     width: 100%;
+    /*overflow: hidden;*/
 }
+
+#date {
+    text-transform: capitalize;
+}
+
+
+canvas {
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+}
+
+#windy {
+    height: 100%;
+    width: 100%;
+    margin: 0 auto;}
+/*#windy #bottom,*/
+/*#windy #mobile-ovr-select,*/
+#windy #playpause,
+#windy .progress-line,
+#windy .box,
+#windy #embed-zoom {
+    display: none !important; }
+#windy #progress-bar {
+    background-color: transparent !important; }
+#windy #logo-wrapper {
+    top: initial;
+    bottom: 50px; }
+#windy #logo-wrapper #logo {
+    left: 50px; }
+#windy .plugin-mobile-rhpane .closing-x {
+    font-size: 24px !important;
+    background-color: transparent !important; }
+
+.bold {font-weight: bold}
