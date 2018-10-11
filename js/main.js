@@ -1,3 +1,4 @@
+// Charts ==============================================================================================================
 new Chart(document.getElementById("bar-chart"), {
     type: 'bar',
     data: {
@@ -19,9 +20,10 @@ new Chart(document.getElementById("bar-chart"), {
     }
 });
 
+// =====================================================================================================================
 
 
-
+// Local time ==========================================================================================================
 moment.locale('es');
 
 $(document).ready(function() {
@@ -31,7 +33,10 @@ $(document).ready(function() {
         $('#date').html(momentNow.format('LLLL').slice(0, -14))
     }, 100);
 });
+// =====================================================================================================================
 
+
+// Map =================================================================================================================
 
 // define options
 const options = {
@@ -53,6 +58,8 @@ windyInit( options, windyAPI => {
     const  { map }  = windyAPI;
     // .map is instance of Leaflet map
 
+    console.log(map);
+
     var DataFrame = dfjs.DataFrame;
 
     // bbox
@@ -61,67 +68,23 @@ windyInit( options, windyAPI => {
         right = -77.2425664944 + 2,
         top = 9.61161001224 + 2;
 
-    var prueba;
+    var overlayMaps = {};
 
+    function getEarthquakes () {
+        DataFrame.fromCSV('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv')
+            .then(df => {
+                console.log(df);
+                var df_pa;
 
-    // function renderEarthquakes () {
-    //     DataFrame.fromCSV('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv')
-    //         .then(df => {
-    //             console.log(df);
-    //             var df_pa;
-    //
-    //             df_pa = df.filter(row => row.get('longitude') >= left && row.get('longitude') <= right);
-    //             df_pa = df_pa.filter(row => row.get('latitude') >= bottom && row.get('latitude') <= top);
-    //
-    //             var eqArray = [];
-    //
-    //             df_pa.map(row => {
-    //
-    //                 // template pop up
-    //                 var popUpTemplate = `
-    //                 <div class="earthquake-popup">
-    //                     <span class="bold">Magnitud</span>:   ${row.get('mag')}   <br>
-    //                     <span class="bold">Fecha</span>:      ${row.get('time')}  <br>
-    //                     <span class="bold">Lugar</span>:      ${row.get('place')} <br>
-    //                 </div>
-    //             `;
-    //
-    //                 // obtener coordenadas (longitud y latitud)
-    //                 const x = row.get('longitude');
-    //                 const y = row.get('latitude');
-    //
-    //                 marker = L.marker([y, x])
-    //                     .bindPopup(popUpTemplate);
-    //
-    //                 eqArray.push(marker);
-    //             });
-    //
-    //
-    //             var earthquakes = L.layerGroup(eqArray);
-    //
-    //         });
-    // }
+                df_pa = df.filter(row => row.get('longitude') >= left && row.get('longitude') <= right);
+                df_pa = df_pa.filter(row => row.get('latitude') >= bottom && row.get('latitude') <= top);
 
-    DataFrame.fromCSV('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv')
-        .then(df => {
-            console.log(df);
-            var df_pa;
+                var eqArray = [];
 
+                df_pa.map(row => {
 
-
-            df_pa = df.filter(row => row.get('longitude') >= left && row.get('longitude') <= right);
-            df_pa = df_pa.filter(row => row.get('latitude') >= bottom && row.get('latitude') <= top);
-
-            df_pa.map(row => {
-
-                // obtener coordenadas (longitud y latitud)
-                const x = row.get('longitude');
-                const y = row.get('latitude');
-
-                marker = L.marker([y, x])
-                    .addTo(map);
-
-                var popUpTemplate = `
+                    // template pop up
+                    var popUpTemplate = `
                     <div class="earthquake-popup">
                         <span class="bold">Magnitud</span>:   ${row.get('mag')}   <br>
                         <span class="bold">Fecha</span>:      ${row.get('time')}  <br>
@@ -129,10 +92,30 @@ windyInit( options, windyAPI => {
                     </div>
                 `;
 
-                marker.bindPopup(popUpTemplate);
-                prueba = df;
+                    // obtener coordenadas (longitud y latitud)
+                    const x = row.get('longitude');
+                    const y = row.get('latitude');
+
+                    marker = L.marker([y, x])
+                        .bindPopup(popUpTemplate);
+
+                    eqArray.push(marker);
+                });
+
+                overlayMaps['Terremotos'] =  L.layerGroup(eqArray);
+                console.log(overlayMaps);
+                // overlayMaps['Terremotos'].addTo(map);
+                L.control.layers(null, overlayMaps).addTo(map);
+
             });
-        });
+    }
+
+    getEarthquakes();
+
+
+
 
 });
+
+// =====================================================================================================================
 
